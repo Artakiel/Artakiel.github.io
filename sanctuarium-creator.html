@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🏰 Sanctuarium Creator — Artakiel#347#+95*</title>
+<meta name="theme-color" content="#0B0F19">
+<style>
+:root {
+  --bg: #0B0F19;
+  --orange: #FF7F50;
+  --turquoise: #40E0D0;
+  --white: #e0e8f0;
+  --muted: #6b7a8d;
+  --card-bg: rgba(15, 20, 35, 0.9);
+  --border: rgba(64, 224, 208, 0.2);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--turquoise);
+  font-family: 'Courier New', monospace;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-image: radial-gradient(circle at 30% 30%, rgba(255,127,80,0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 70%, rgba(64,224,208,0.05) 0%, transparent 50%);
+}
+.container {
+  max-width: 720px;
+  width: 100%;
+}
+.card {
+  background: var(--card-bg);
+  border: 2px solid var(--orange);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 0 30px rgba(255,127,80,0.15);
+  backdrop-filter: blur(10px);
+}
+h1 {
+  color: var(--orange);
+  font-family: 'Georgia', serif;
+  font-size: 2rem;
+  font-weight: 300;
+  text-align: center;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.3rem;
+}
+.subtitle {
+  text-align: center;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+.status-row span:last-child {
+  color: var(--orange);
+  font-weight: bold;
+}
+.slider-group {
+  margin: 1.5rem 0;
+}
+.slider-group label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+.slider-group input[type=range] {
+  width: 100%;
+  accent-color: var(--orange);
+  height: 6px;
+}
+.slider-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.55rem;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+.btn {
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  background: transparent;
+  border: 2px solid var(--turquoise);
+  color: var(--turquoise);
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin: 1rem 0;
+}
+.btn:hover:not(:disabled) {
+  background: var(--turquoise);
+  color: var(--bg);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.result-card {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+}
+.result-grid .label { color: var(--muted); }
+.result-grid .value { text-align: right; font-weight: bold; }
+.result-grid .value.positive { color: var(--turquoise); }
+.result-grid .value.sanctuary { color: var(--orange); }
+.hash-line {
+  font-size: 0.5rem;
+  color: var(--muted);
+  word-break: break-all;
+  margin-top: 0.5rem;
+  opacity: 0.7;
+}
+.history {
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 0.6rem;
+  color: var(--muted);
+}
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.5rem;
+  color: var(--muted);
+  opacity: 0.6;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <h1>SANCTUARIUM</h1>
+    <p class="subtitle">CYCLE OUROBOROS · #347#+95*</p>
+
+    <div class="status-row">
+      <span>Statut Système</span>
+      <span id="status">Isolation Locale Maintenue</span>
+    </div>
+    <div class="status-row">
+      <span>Cycle Actuel</span>
+      <span id="cycle-num">0</span>
+    </div>
+    <div class="status-row">
+      <span>Sanctuarisation</span>
+      <span>20% Intouchables</span>
+    </div>
+
+    <div class="slider-group">
+      <label>Sincérité <span id="sincerity-val">50%</span></label>
+      <input type="range" id="sincerity-slider" min="0" max="100" value="50">
+      <div class="slider-ends">
+        <span>0% (Corrompu)</span>
+        <span>100% (Absolu)</span>
+      </div>
+    </div>
+
+    <button class="btn" id="mine-btn" onclick="executerCycle()">⚡ Initialiser la Sincérité</button>
+
+    <div class="result-card" id="result-card" style="display:none;">
+      <h3 style="color:var(--orange);font-size:0.7rem;margin-bottom:0.5rem;">Dernier Cycle</h3>
+      <div class="result-grid">
+        <span class="label">Émotion compilée</span>
+        <span class="value positive" id="res-emotion">-</span>
+        <span class="label">Tokens bruts</span>
+        <span class="value positive" id="res-bruts">-</span>
+        <span class="label">Sanctuarisé (20%)</span>
+        <span class="value sanctuary" id="res-vault">-</span>
+        <span class="label">ARTA disponible</span>
+        <span class="value positive" id="res-arta">-</span>
+      </div>
+      <p class="hash-line" id="res-hash"></p>
+    </div>
+
+    <div class="history" id="history"></div>
+  </div>
+
+  <p class="footer">
+    #347#{artakiel+loïc.cousin©=gimulinel}×[~]#95# · AES-256-GCM ready · SHA-256 local
+  </p>
+</div>
+
+<script>
+// ─── CONSTANTES ───────────────────────────────────────────────
+const SANCTUARISATION_RATE = 0.20;
+const MAX_TOKENS = 1000;
+
+let cycleCount = 0;
+let history = [];
+
+// ─── SHA-256 LOCAL ────────────────────────────────────────────
+async function sha256(text) {
+  const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ─── ALGORITHME ÉMOTIONNEL ───────────────────────────────────
+function compilerEmotion(gravite, temporalite, infini, information) {
+  const g = Math.min(1, Math.max(0, gravite));
+  const t = Math.min(2, Math.max(0.1, temporalite));
+  const i = Math.min(1, Math.max(0, infini));
+  const info = Math.min(1, Math.max(0, information));
+  return Math.round(g * t * i * info * 100);
+}
+
+// ─── MINING POÉTIQUE ─────────────────────────────────────────
+function calculerArta(sincerite) {
+  const s = Math.min(100, Math.max(0, sincerite));
+  const tokensBruts = Math.floor((s / 100) * MAX_TOKENS);
+  const vaultSanctuarise = Math.floor(tokensBruts * SANCTUARISATION_RATE);
+  const artaDisponible = tokensBruts - vaultSanctuarise;
+  return { tokensBruts, vaultSanctuarise, artaDisponible };
+}
+
+// ─── CYCLE OUROBOROS ─────────────────────────────────────────
+async function executerCycle() {
+  const btn = document.getElementById('mine-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Cycle en cours...';
+  document.getElementById('status').textContent = 'Cycle en cours...';
+
+  const sincerite = parseInt(document.getElementById('sincerity-slider').value);
+  const hour = new Date().getHours();
+  const temporalite = hour < 5 ? 1.3 : hour < 9 ? 1.2 : hour < 18 ? 1.0 : 1.15;
+
+  const emotion = compilerEmotion(0.5, temporalite, 0.77, 0.8);
+  const arta = calculerArta(sincerite);
+
+  const payload = JSON.stringify({ cycle: cycleCount + 1, timestamp: Date.now(), emotion, arta });
+  const hash = await sha256(payload);
+
+  const record = { cycle: cycleCount + 1, timestamp: Date.now(), emotion, arta, hash: hash.slice(0, 32) };
+  history.unshift(record);
+  if (history.length > 50) history = history.slice(0, 50);
+  cycleCount++;
+
+  // Afficher le résultat
+  document.getElementById('cycle-num').textContent = cycleCount;
+  document.getElementById('res-emotion').textContent = emotion + '%';
+  document.getElementById('res-bruts').textContent = arta.tokensBruts;
+  document.getElementById('res-vault').textContent = '-' + arta.vaultSanctuarise;
+  document.getElementById('res-arta').textContent = arta.artaDisponible;
+  document.getElementById('res-hash').textContent = 'SHA-256: ' + hash.slice(0, 32) + '...';
+  document.getElementById('result-card').style.display = 'block';
+
+  // Mettre à jour l'historique
+  const historyDiv = document.getElementById('history');
+  historyDiv.innerHTML = history.slice(0, 10).map(r =>
+    `<div class="history-item">
+      <span>Cycle #${r.cycle}</span>
+      <span>${r.emotion}% émot.</span>
+      <span>+${r.arta.artaDisponible} ARTA</span>
+      <span style="font-size:0.45rem;">${r.hash.slice(0,8)}</span>
+    </div>`
+  ).join('');
+
+  document.getElementById('status').textContent = 'Isolation Locale Maintenue';
+  btn.disabled = false;
+  btn.textContent = '⚡ Initialiser la Sincérité';
+}
+
+// ─── SLIDER ──────────────────────────────────────────────────
+document.getElementById('sincerity-slider').addEventListener('input', function() {
+  document.getElementById('sincerity-val').textContent = this.value + '%';
+});
+</script>
+</body>
+</html>

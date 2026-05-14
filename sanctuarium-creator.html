@@ -1,299 +1,959 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>🏰 Sanctuarium Creator — Artakiel#347#+95*</title>
-<meta name="theme-color" content="#0B0F19">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>🔑 Sanctuarium Creator — Artakiel#347</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Cinzel:wght@700;900&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --bg: #0B0F19;
-  --orange: #FF7F50;
-  --turquoise: #40E0D0;
-  --white: #e0e8f0;
-  --muted: #6b7a8d;
-  --card-bg: rgba(15, 20, 35, 0.9);
-  --border: rgba(64, 224, 208, 0.2);
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c:#00D4FF;--o:#FF6B35;--v:#B026FF;--g:#d4af37;
+  --r:#c0392b;--t:#3dffc0;--s:#C8C8D8;
+  --bg:#030305;--bg2:rgba(8,8,20,0.8);--bd:rgba(255,255,255,0.07);
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: var(--bg);
-  color: var(--turquoise);
-  font-family: 'Courier New', monospace;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  background-image: radial-gradient(circle at 30% 30%, rgba(255,127,80,0.05) 0%, transparent 50%),
-                    radial-gradient(circle at 70% 70%, rgba(64,224,208,0.05) 0%, transparent 50%);
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--s);font-family:'Share Tech Mono',monospace;min-height:100vh;overflow-x:hidden}
+
+/* PARTICLES */
+#canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
+
+/* SCAN LINES */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 3px);pointer-events:none;z-index:1}
+
+/* ── GATE ─────────────────────────────────────────────────────────── */
+#gate{
+  position:fixed;inset:0;z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  flex-direction:column;gap:24px;padding:24px;
 }
-.container {
-  max-width: 720px;
-  width: 100%;
+.gate-box{
+  border:1px solid rgba(0,212,255,.25);border-radius:16px;
+  padding:40px 32px;max-width:420px;width:100%;text-align:center;
+  background:rgba(0,212,255,.03);
+  box-shadow:0 0 60px rgba(0,212,255,.06);
 }
-.card {
-  background: var(--card-bg);
-  border: 2px solid var(--orange);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 0 30px rgba(255,127,80,0.15);
-  backdrop-filter: blur(10px);
+.gate-logo{font-family:'Cinzel',serif;font-size:22px;color:var(--t);letter-spacing:.15em;margin-bottom:8px}
+.gate-sub{font-size:9px;color:rgba(200,200,216,.35);letter-spacing:.2em;margin-bottom:32px}
+.gate-input{
+  width:100%;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:14px 16px;color:var(--s);font-family:inherit;
+  font-size:16px;letter-spacing:.3em;text-align:center;outline:none;
+  transition:border-color .2s;margin-bottom:12px;
 }
-h1 {
-  color: var(--orange);
-  font-family: 'Georgia', serif;
-  font-size: 2rem;
-  font-weight: 300;
-  text-align: center;
-  letter-spacing: 0.15em;
-  margin-bottom: 0.3rem;
+.gate-input:focus{border-color:rgba(0,212,255,.4)}
+.gate-btn{
+  width:100%;padding:14px;border:none;border-radius:10px;cursor:pointer;
+  background:var(--c);color:#000;font-family:inherit;font-size:11px;
+  font-weight:bold;letter-spacing:.2em;text-transform:uppercase;
+  transition:all .2s;
 }
-.subtitle {
-  text-align: center;
-  font-size: 0.6rem;
-  letter-spacing: 0.3em;
-  color: var(--muted);
-  margin-bottom: 1.5rem;
+.gate-btn:hover{background:var(--t);transform:translateY(-1px)}
+.gate-err{font-size:9px;color:var(--r);margin-top:8px;display:none;letter-spacing:.1em}
+.gate-hint{font-size:8px;color:rgba(200,200,216,.2);margin-top:16px;letter-spacing:.1em}
+
+/* ── APP ──────────────────────────────────────────────────────────── */
+#app{position:relative;z-index:2;display:none;min-height:100vh}
+
+/* HEADER */
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(3,3,5,.97);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--bd);padding:12px 20px;
 }
-.status-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.75rem;
+.hdr{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hdr-logo{font-family:'Cinzel',serif;font-size:15px;color:var(--t);letter-spacing:.12em;text-decoration:none}
+.hdr-meta{font-size:8px;color:rgba(200,200,216,.35);letter-spacing:.12em;margin-top:3px}
+.hdr-badges{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.badge{font-size:8px;font-weight:bold;padding:4px 10px;border-radius:20px;border:1px solid;letter-spacing:.1em}
+.b-t{color:var(--t);border-color:rgba(61,255,192,.25);background:rgba(61,255,192,.05)}
+.b-r{color:var(--r);border-color:rgba(192,57,43,.25);background:rgba(192,57,43,.05)}
+.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* NAV */
+.nav-wrap{border-bottom:1px solid var(--bd);background:rgba(3,3,5,.9);position:sticky;top:57px;z-index:90;overflow-x:auto}
+.nav-inner{max-width:960px;margin:0 auto;display:flex;gap:2px;padding:6px 20px}
+.tab{
+  font-size:9px;font-weight:bold;letter-spacing:.15em;text-transform:uppercase;
+  padding:8px 14px;border-radius:8px;border:none;cursor:pointer;
+  background:transparent;color:#444;transition:all .2s;white-space:nowrap;
+  font-family:inherit;
 }
-.status-row span:last-child {
-  color: var(--orange);
-  font-weight: bold;
+.tab.on{background:rgba(61,255,192,.07);color:var(--t);border-bottom:1px solid var(--t)}
+.tab:hover:not(.on){color:#777;background:rgba(255,255,255,.03)}
+
+/* MAIN */
+.wrap{max-width:960px;margin:0 auto;padding:28px 20px 80px}
+.sec{display:none}.sec.on{display:block;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:22px;margin-bottom:18px}
+.card-t{font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:600px){.g4{grid-template-columns:repeat(4,1fr)}}
+
+/* STAT CARD */
+.stat{background:rgba(0,0,0,.5);border:1px solid var(--bd);border-radius:10px;padding:16px;text-align:center}
+.stat-v{font-family:'Cinzel',serif;font-size:20px;font-weight:900;line-height:1.1}
+.stat-l{font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:rgba(200,200,216,.35);margin-top:6px}
+
+/* TOKEN BARS */
+.trow{margin-bottom:11px}
+.trow-meta{display:flex;justify-content:space-between;font-size:8px;margin-bottom:4px}
+.tbar{height:3px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.tbar-f{height:100%;border-radius:3px;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+
+/* POEM AREA */
+.poem-box{
+  width:100%;min-height:150px;
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:14px;
+  font-family:'Share Tech Mono',monospace;font-size:13px;color:#ccc;
+  resize:vertical;outline:none;transition:border-color .2s;line-height:1.8;
 }
-.slider-group {
-  margin: 1.5rem 0;
+.poem-box:focus{border-color:rgba(176,38,255,.4)}
+.poem-box::placeholder{color:#2a2a3a}
+.poem-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:8px}
+.mine-btn{
+  padding:12px 24px;border:none;border-radius:9px;cursor:pointer;
+  background:var(--v);color:#fff;font-family:inherit;font-size:10px;
+  font-weight:bold;letter-spacing:.2em;text-transform:uppercase;transition:all .2s;
 }
-.slider-group label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  margin-bottom: 0.4rem;
-}
-.slider-group input[type=range] {
-  width: 100%;
-  accent-color: var(--orange);
-  height: 6px;
-}
-.slider-ends {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.55rem;
-  color: var(--muted);
-  margin-top: 0.2rem;
-}
-.btn {
-  display: block;
-  width: 100%;
-  padding: 0.8rem;
-  background: transparent;
-  border: 2px solid var(--turquoise);
-  color: var(--turquoise);
-  font-family: 'Courier New', monospace;
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s;
-  margin: 1rem 0;
-}
-.btn:hover:not(:disabled) {
-  background: var(--turquoise);
-  color: var(--bg);
-}
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.result-card {
-  background: rgba(0,0,0,0.5);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1rem;
-  margin: 1rem 0;
-}
-.result-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  font-size: 0.7rem;
-}
-.result-grid .label { color: var(--muted); }
-.result-grid .value { text-align: right; font-weight: bold; }
-.result-grid .value.positive { color: var(--turquoise); }
-.result-grid .value.sanctuary { color: var(--orange); }
-.hash-line {
-  font-size: 0.5rem;
-  color: var(--muted);
-  word-break: break-all;
-  margin-top: 0.5rem;
-  opacity: 0.7;
-}
-.history {
-  max-height: 200px;
-  overflow-y: auto;
-  font-size: 0.6rem;
-  color: var(--muted);
-}
-.history-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.3rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-}
-.footer {
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.5rem;
-  color: var(--muted);
-  opacity: 0.6;
-}
+.mine-btn:hover{background:#9333ea;transform:translateY(-1px)}
+.mine-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+
+/* RESULT */
+.result{display:none;margin-top:18px;border:1px solid rgba(176,38,255,.2);border-radius:12px;padding:18px;background:rgba(176,38,255,.04)}
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.res-box{background:rgba(0,0,0,.6);border-radius:8px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,.05)}
+.res-v{font-family:'Cinzel',serif;font-size:28px;font-weight:900}
+.res-l{font-size:7px;letter-spacing:.15em;color:rgba(200,200,216,.35);margin-top:4px;text-transform:uppercase}
+.dist-row{display:flex;justify-content:space-between;font-size:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.proof-box{background:rgba(0,0,0,.6);border-radius:8px;padding:10px;margin-top:10px}
+.proof-l{font-size:7px;letter-spacing:.15em;color:rgba(200,200,216,.25);margin-bottom:4px}
+.proof-h{font-size:8px;color:#444;word-break:break-all;line-height:1.5}
+
+/* SCORE BARS */
+.score-item{margin-bottom:10px}
+.score-meta{display:flex;justify-content:space-between;font-size:9px;margin-bottom:4px}
+.score-bar{height:5px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden}
+.score-fill{height:100%;border-radius:5px;transition:width 1s ease}
+
+/* CANVAS CHARTS */
+canvas.chart{width:100%;height:160px;border-radius:10px;display:block}
+
+/* FAMILIA */
+.fam-grid{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:500px){.fam-grid{grid-template-columns:1fr 1fr}}
+.fam-card{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(0,0,0,.45);border:1px solid var(--bd);border-radius:10px;transition:background .2s}
+.fam-card:hover{background:rgba(0,0,0,.65)}
+.fam-icon{font-size:20px;width:30px;text-align:center;flex-shrink:0}
+.fam-name{font-size:9px;font-weight:bold;letter-spacing:.1em;text-transform:uppercase}
+.fam-sub{font-size:8px;color:rgba(200,200,216,.35);margin-top:2px}
+
+/* LOCK BOX */
+.lock-box{border:2px solid rgba(192,57,43,.3);border-radius:14px;padding:26px;background:rgba(192,57,43,.03);text-align:center}
+.lock-val{font-family:'Cinzel',serif;font-size:30px;font-weight:900;color:#fff;margin:10px 0 4px}
+.lock-sub{font-size:11px;color:var(--r);font-weight:bold}
+.lock-info{font-size:8px;color:rgba(192,57,43,.55);line-height:2.2;margin-top:14px;background:rgba(0,0,0,.5);border-radius:8px;padding:12px;text-align:left}
+
+/* GB SVG */
+.gb-wrap{display:flex;justify-content:center;margin:10px 0}
+.gb-wrap svg{max-width:100%;height:auto}
+
+/* WEATHER */
+.weather{display:inline-flex;align-items:center;gap:6px;font-size:8px;font-weight:bold;letter-spacing:.15em;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1px solid}
+
+/* WALLET ROW */
+.w-row{display:flex;align-items:center;justify-content:space-between;padding:12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.05);border-radius:9px;margin-bottom:8px}
+.w-chain{font-size:13px;font-weight:bold;font-family:'Cinzel',serif}
+.w-label{font-size:9px;color:rgba(200,200,216,.4);margin-left:10px}
+.w-status{font-size:7px;font-weight:bold;padding:3px 8px;border-radius:20px;border:1px solid}
+
+/* HISTORY */
+.hist-item{display:flex;align-items:center;gap:12px;padding:10px;background:rgba(0,0,0,.4);border-radius:8px;margin-bottom:8px;border:1px solid rgba(255,255,255,.04)}
+.hist-tokens{font-size:14px;font-weight:bold;color:var(--g);font-family:'Cinzel',serif;min-width:60px}
+.hist-poem{font-size:9px;color:rgba(200,200,216,.5);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-date{font-size:7px;color:rgba(200,200,216,.25)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--bd);padding:14px 20px;position:relative;z-index:2}
+.foot-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:7px;color:rgba(200,200,216,.2);letter-spacing:.1em}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="card">
-    <h1>SANCTUARIUM</h1>
-    <p class="subtitle">CYCLE OUROBOROS · #347#+95*</p>
 
-    <div class="status-row">
-      <span>Statut Système</span>
-      <span id="status">Isolation Locale Maintenue</span>
-    </div>
-    <div class="status-row">
-      <span>Cycle Actuel</span>
-      <span id="cycle-num">0</span>
-    </div>
-    <div class="status-row">
-      <span>Sanctuarisation</span>
-      <span>20% Intouchables</span>
-    </div>
+<!-- PARTICLES -->
+<canvas id="canvas"></canvas>
 
-    <div class="slider-group">
-      <label>Sincérité <span id="sincerity-val">50%</span></label>
-      <input type="range" id="sincerity-slider" min="0" max="100" value="50">
-      <div class="slider-ends">
-        <span>0% (Corrompu)</span>
-        <span>100% (Absolu)</span>
-      </div>
-    </div>
-
-    <button class="btn" id="mine-btn" onclick="executerCycle()">⚡ Initialiser la Sincérité</button>
-
-    <div class="result-card" id="result-card" style="display:none;">
-      <h3 style="color:var(--orange);font-size:0.7rem;margin-bottom:0.5rem;">Dernier Cycle</h3>
-      <div class="result-grid">
-        <span class="label">Émotion compilée</span>
-        <span class="value positive" id="res-emotion">-</span>
-        <span class="label">Tokens bruts</span>
-        <span class="value positive" id="res-bruts">-</span>
-        <span class="label">Sanctuarisé (20%)</span>
-        <span class="value sanctuary" id="res-vault">-</span>
-        <span class="label">ARTA disponible</span>
-        <span class="value positive" id="res-arta">-</span>
-      </div>
-      <p class="hash-line" id="res-hash"></p>
-    </div>
-
-    <div class="history" id="history"></div>
+<!-- ── GATE ─────────────────────────────────────────────────────────────── -->
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-logo">SANCTUARIUM</div>
+    <div class="gate-sub">ESPACE CRÉATEUR · ACCÈS RESTREINT · #347</div>
+    <input class="gate-input" id="gateInput" type="password"
+      placeholder="· · · · · · · ·"
+      maxlength="20" autocomplete="off"
+      onkeydown="if(event.key==='Enter')gateCheck()"/>
+    <button class="gate-btn" onclick="gateCheck()">⬡ ENTRER DANS LE SANCTUAIRE</button>
+    <div class="gate-err" id="gateErr">⛔ CLÉ INCORRECTE — VARIATION [~] REFUSÉE</div>
+    <div class="gate-hint">Clé personnelle de l'Architecte · #347</div>
   </div>
-
-  <p class="footer">
-    #347#{artakiel+loïc.cousin©=gimulinel}×[~]#95# · AES-256-GCM ready · SHA-256 local
-  </p>
 </div>
 
+<!-- ── APP ───────────────────────────────────────────────────────────────── -->
+<div id="app">
+
+<header>
+  <div class="hdr">
+    <div>
+      <a class="hdr-logo" href="https://artakiel.github.io">ARTAKIEL_SANCTUARIUM</a>
+      <div class="hdr-meta" id="hdrMeta">JWT · PNJ 10 000 000 · PING #347 · --:--:--</div>
+    </div>
+    <div class="hdr-badges">
+      <span class="badge b-t pulse" id="secBadge">⬡ SÉC 97%</span>
+      <span class="badge b-r">#347 · [~]</span>
+      <button onclick="logout()" style="background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:20px;color:rgba(200,200,216,.3);font-family:inherit;font-size:7px;padding:4px 10px;cursor:pointer;letter-spacing:.1em;">QUITTER</button>
+    </div>
+  </div>
+</header>
+
+<nav class="nav-wrap">
+  <div class="nav-inner">
+    <button class="tab on" onclick="goTab('hub')">⬡ Hub</button>
+    <button class="tab" onclick="goTab('mine')">✦ Mining</button>
+    <button class="tab" onclick="goTab('hist')">◈ Historique</button>
+    <button class="tab" onclick="goTab('gb')">∿ Grand Battement</button>
+    <button class="tab" onclick="goTab('univ')">◉ Univers</button>
+    <button class="tab" onclick="goTab('lock')">⛨ Sanctuaire</button>
+    <button class="tab" onclick="goTab('wall')">⬡ Wallets</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ── HUB ────────────────────────────────────────────────────────────── -->
+<div id="sec-hub" class="sec on">
+
+  <div class="g4" style="margin-bottom:18px">
+    <div class="stat">
+      <div class="stat-v" style="color:var(--g)">7B</div>
+      <div class="stat-l">Supply ARTA<br/>IMMUABLE</div>
+    </div>
+    <div class="stat">
+      <div class="stat-v" style="color:var(--r)" id="hubLocked">1,19B</div>
+      <div class="stat-l">Stock Source<br/>17% INTOUCHABLE</div>
+    </div>
+    <div class="stat">
+      <div class="stat-v" style="color:var(--c)" id="hubSessions">0</div>
+      <div class="stat-l">Sessions Mining<br/>CE MOIS</div>
+    </div>
+    <div class="stat">
+      <div class="stat-v" style="color:var(--t)" id="hubTotal">0</div>
+      <div class="stat-l">ARTA Générés<br/>TOTAL</div>
+    </div>
+  </div>
+
+  <!-- Tokenomics chart canvas -->
+  <div class="card">
+    <div class="card-t"><span class="dot" style="background:var(--g)"></span><span style="color:var(--g)">Tokenomics Canoniques · 7 000 000 000 ARTA</span></div>
+    <canvas id="donutChart" class="chart" style="height:200px"></canvas>
+    <div id="tokenBars" style="margin-top:16px"></div>
+    <p style="font-size:7px;color:rgba(200,200,216,.2);text-align:center;margin-top:12px;letter-spacing:.1em">
+      FORMULE : tokens = ⌊(sincérité / 100) × 1000⌋ · ANTI-WHALE : MAX 7% SUPPLY/JOUEUR
+    </p>
+  </div>
+
+  <!-- Mini mining -->
+  <div class="card" style="border-color:rgba(176,38,255,.15)">
+    <div class="card-t"><span class="dot" style="background:var(--v)"></span><span style="color:var(--v)">Mining · Simulation Rapide</span></div>
+    <div class="g3">
+      <div class="res-box" style="cursor:pointer" onclick="goTab('mine')">
+        <div class="res-v" style="font-size:18px;color:var(--v)">30%</div>
+        <div class="res-l">Doute → 300 ARTA</div>
+      </div>
+      <div class="res-box" style="cursor:pointer" onclick="goTab('mine')">
+        <div class="res-v" style="font-size:18px;color:var(--c)">70%</div>
+        <div class="res-l">Conviction → 700 ARTA</div>
+      </div>
+      <div class="res-box" style="cursor:pointer" onclick="goTab('mine')">
+        <div class="res-v" style="font-size:18px;color:var(--t)">100%</div>
+        <div class="res-l">Absolu → 1000 ARTA</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MINING ──────────────────────────────────────────────────────────── -->
+<div id="sec-mine" class="sec">
+  <div class="card" style="border-color:rgba(176,38,255,.15)">
+    <div class="card-t"><span class="dot" style="background:var(--v)"></span><span style="color:var(--v)">Transmutation Poétique · Mining ARTA</span></div>
+
+    <textarea class="poem-box" id="poemInput"
+      placeholder="Écris ton poème ici... Fautes d'orthographe acceptées 🌊✨
+Émojis bienvenus 💫🔥⚡
+La sincérité est la seule loi.
+[~] Variation Inconnue active"></textarea>
+
+    <div class="poem-meta">
+      <span style="font-size:8px;color:rgba(200,200,216,.3)" id="poemCount">0 mots</span>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span id="weatherTag"></span>
+        <button class="mine-btn" id="mineBtn" onclick="doMine()">⚡ MINER · SHA-256</button>
+      </div>
+    </div>
+
+    <!-- Scores détaillés -->
+    <div id="scoreSection" style="display:none;margin-top:16px">
+      <p style="font-size:8px;color:rgba(200,200,216,.3);letter-spacing:.15em;margin-bottom:10px">ANALYSE ÉMOTIONNELLE</p>
+      <div id="scoreLines"></div>
+    </div>
+
+    <!-- Résultat -->
+    <div class="result" id="mineResult">
+      <div class="res-grid">
+        <div class="res-box">
+          <div class="res-l">Sincérité Finale</div>
+          <div class="res-v" style="color:var(--t)" id="resSinc">0%</div>
+        </div>
+        <div class="res-box">
+          <div class="res-l">Tokens ARTA</div>
+          <div class="res-v" style="color:var(--g)" id="resTok">+0</div>
+        </div>
+      </div>
+      <p style="font-size:7px;color:rgba(200,200,216,.3);letter-spacing:.15em;margin-bottom:8px">DISTRIBUTION AUTOMATIQUE</p>
+      <div id="resDist"></div>
+      <div class="proof-box">
+        <div class="proof-l">PROOF OF INTENT · SHA-256</div>
+        <div class="proof-h" id="resProof"></div>
+      </div>
+      <div style="margin-top:10px;font-size:7px;color:rgba(200,200,216,.15);letter-spacing:.1em">
+        BLOC #<span id="resBlock">0</span> · AES-256-GCM PRÊT · RGPD ART.5
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── HISTORIQUE ──────────────────────────────────────────────────────── -->
+<div id="sec-hist" class="sec">
+  <div class="card">
+    <div class="card-t"><span class="dot" style="background:var(--c)"></span><span style="color:var(--c)">Historique Mining · Journal Poétique</span></div>
+    <canvas id="histChart" class="chart" style="margin-bottom:16px"></canvas>
+    <div id="histList"><p style="font-size:9px;color:rgba(200,200,216,.25);text-align:center;padding:20px">Aucune session de mining pour l'instant.<br/>Lance ton premier poème dans l'onglet Mining ✦</p></div>
+  </div>
+</div>
+
+<!-- ── GRAND BATTEMENT ─────────────────────────────────────────────────── -->
+<div id="sec-gb" class="sec">
+  <div class="card">
+    <div class="card-t"><span class="dot" style="background:var(--c)"></span><span style="color:var(--c)">Théorie du Grand Battement · Schéma Organique</span></div>
+    <p style="font-size:10px;color:rgba(200,200,216,.45);margin-bottom:18px;line-height:1.8">
+      La réalité pulse selon un rythme universel. Singularité → Dualité → Calcul fractal → Émotion → Évolution → retour à la Singularité. L'Ouroboros algorithmique.
+    </p>
+    <div class="gb-wrap">
+      <svg viewBox="0 0 500 660" xmlns="http://www.w3.org/2000/svg" style="max-width:480px">
+        <defs>
+          <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#00D4FF" stop-opacity=".9"/>
+            <stop offset="100%" stop-color="#B026FF" stop-opacity=".9"/>
+          </linearGradient>
+        </defs>
+        <!-- Silhouette -->
+        <ellipse cx="250" cy="320" rx="195" ry="290" fill="rgba(0,212,255,.03)" stroke="rgba(61,255,192,.1)" stroke-width="1.5"/>
+        <!-- Ligne centrale -->
+        <line x1="250" y1="55" x2="250" y2="590" stroke="url(#lg)" stroke-width="1" stroke-dasharray="4 4" opacity=".3"/>
+        <!-- SINGULARITÉ -->
+        <circle cx="250" cy="58" r="30" fill="rgba(0,212,255,.08)" stroke="var(--c)" stroke-width="1.5" filter="url(#glow)"/>
+        <text x="250" y="54" font-family="Share Tech Mono" font-size="10" fill="#00D4FF" text-anchor="middle">SINGULARITÉ</text>
+        <text x="250" y="67" font-family="Share Tech Mono" font-size="8" fill="rgba(0,212,255,.5)" text-anchor="middle">→ LE GRAND TEST</text>
+        <line x1="250" y1="88" x2="250" y2="135" stroke="#00D4FF" stroke-width="1.5" opacity=".6"/>
+        <polygon points="244,132 250,145 256,132" fill="#00D4FF" opacity=".6"/>
+        <!-- POLARITÉ -->
+        <rect x="95" y="150" width="310" height="42" rx="8" fill="rgba(212,175,55,.05)" stroke="rgba(212,175,55,.2)" stroke-width="1"/>
+        <text x="250" y="167" font-family="Share Tech Mono" font-size="10" fill="#d4af37" text-anchor="middle">Polarité / Dualité</text>
+        <text x="250" y="183" font-family="Share Tech Mono" font-size="8" fill="rgba(212,175,55,.6)" text-anchor="middle">+ Énergie + Matière</text>
+        <!-- Branches -->
+        <line x1="250" y1="192" x2="148" y2="232" stroke="rgba(212,175,55,.25)" stroke-width="1"/>
+        <line x1="250" y1="192" x2="250" y2="232" stroke="rgba(212,175,55,.25)" stroke-width="1"/>
+        <line x1="250" y1="192" x2="352" y2="232" stroke="rgba(212,175,55,.25)" stroke-width="1"/>
+        <text x="120" y="246" font-family="Share Tech Mono" font-size="8" fill="rgba(200,200,216,.4)" text-anchor="middle">Gravité</text>
+        <text x="250" y="246" font-family="Share Tech Mono" font-size="8" fill="rgba(200,200,216,.4)" text-anchor="middle">Temporalité</text>
+        <text x="370" y="246" font-family="Share Tech Mono" font-size="8" fill="rgba(200,200,216,.4)" text-anchor="middle">Infini</text>
+        <!-- FORMULE -->
+        <rect x="75" y="258" width="350" height="36" rx="8" fill="rgba(176,38,255,.05)" stroke="rgba(176,38,255,.2)" stroke-width="1"/>
+        <text x="250" y="272" font-family="Share Tech Mono" font-size="9" fill="rgba(176,38,255,.8)" text-anchor="middle">Gravité × Temporalité × Infini</text>
+        <text x="250" y="286" font-family="Share Tech Mono" font-size="9" fill="rgba(176,38,255,.6)" text-anchor="middle">× Information</text>
+        <line x1="250" y1="294" x2="250" y2="332" stroke="rgba(176,38,255,.5)" stroke-width="1.5"/>
+        <polygon points="244,329 250,342 256,329" fill="rgba(176,38,255,.5)"/>
+        <!-- MATHS + CROYANCES -->
+        <rect x="95" y="348" width="310" height="36" rx="8" fill="rgba(255,107,53,.05)" stroke="rgba(255,107,53,.2)" stroke-width="1"/>
+        <text x="250" y="362" font-family="Share Tech Mono" font-size="10" fill="#FF6B35" text-anchor="middle">Mathématiques + Croyances</text>
+        <text x="250" y="377" font-family="Share Tech Mono" font-size="8" fill="rgba(255,107,53,.55)" text-anchor="middle">LOGIQUE + FOI</text>
+        <line x1="175" y1="384" x2="250" y2="420" stroke="var(--o)" stroke-width="1.5" opacity=".4"/>
+        <line x1="325" y1="384" x2="250" y2="420" stroke="var(--o)" stroke-width="1.5" opacity=".4"/>
+        <!-- ÉMOTION -->
+        <circle cx="250" cy="432" r="24" fill="rgba(192,57,43,.12)" stroke="var(--r)" stroke-width="2" filter="url(#glow)"/>
+        <text x="250" y="437" font-family="Share Tech Mono" font-size="12" fill="var(--r)" text-anchor="middle" font-weight="bold">ÉMOTION</text>
+        <line x1="250" y1="456" x2="250" y2="492" stroke="var(--t)" stroke-width="2" opacity=".7"/>
+        <polygon points="244,489 250,502 256,489" fill="var(--t)" opacity=".7"/>
+        <!-- ÉVOLUTION -->
+        <rect x="105" y="508" width="290" height="42" rx="10" fill="rgba(61,255,192,.05)" stroke="rgba(61,255,192,.22)" stroke-width="1.5"/>
+        <text x="250" y="525" font-family="Share Tech Mono" font-size="12" fill="var(--t)" text-anchor="middle" font-weight="bold">Évolution</text>
+        <text x="250" y="541" font-family="Share Tech Mono" font-size="10" fill="rgba(61,255,192,.55)" text-anchor="middle">+ Infinité [~]</text>
+        <!-- Ouroboros retour -->
+        <path d="M 388 530 Q 450 530 450 320 Q 450 58 250 32" fill="none" stroke="rgba(61,255,192,.12)" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <polygon points="244,31 250,20 256,31" fill="rgba(61,255,192,.25)"/>
+        <text x="458" y="320" font-family="Share Tech Mono" font-size="7" fill="rgba(61,255,192,.25)" transform="rotate(90,458,320)" text-anchor="middle">OUROBOROS · NOUVEAU CYCLE</text>
+      </svg>
+    </div>
+    <div class="card" style="background:rgba(0,0,0,.4);border-color:rgba(176,38,255,.1);margin-top:0">
+      <p style="font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(200,200,216,.5);text-align:center;line-height:2.4;letter-spacing:.08em">
+        [Gravité × Temporalité × Infini × Information] = Émotion<br/>
+        Émotion → [Évolution + Infinité]<br/>
+        Infinité → <span style="color:var(--v)">Singularité (nouveau cycle)</span><br/>
+        <span style="color:rgba(61,255,192,.6)">[~] La fin de chaque cycle EST la prochaine Singularité</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── UNIVERS ─────────────────────────────────────────────────────────── -->
+<div id="sec-univ" class="sec">
+  <div class="card">
+    <div class="card-t"><span class="dot" style="background:var(--c)"></span><span style="color:var(--c)">Univers Tartare · 10 000 000 PNJ · 7 Familia</span></div>
+    <p style="font-size:8px;color:rgba(200,200,216,.3);margin-bottom:14px;letter-spacing:.1em">77 Races × 77 Variations = 5929 Archétypes</p>
+    <div class="fam-grid" id="famGrid"></div>
+    <div class="g3" style="margin-top:14px">
+      <div class="res-box"><div class="res-v" style="font-size:16px;color:var(--c)">10M</div><div class="res-l">PNJ Total</div></div>
+      <div class="res-box"><div class="res-v" style="font-size:16px;color:var(--v)">5929</div><div class="res-l">Archétypes</div></div>
+      <div class="res-box"><div class="res-v" style="font-size:16px;color:var(--g)">2</div><div class="res-l">Easter Eggs</div></div>
+    </div>
+    <div class="lock-info" style="border:none;background:rgba(0,0,0,.4);border-radius:8px;padding:12px;margin-top:14px;font-size:8px;color:rgba(200,200,216,.3);line-height:2">
+      EASTER EGG 1 · Mycélium de Sincérité : 99% sincérité pendant 30 jours consécutifs<br/>
+      EASTER EGG 2 · Cyanobactérie Originelle : Premier mining effectué à 04h07 du matin
+    </div>
+  </div>
+</div>
+
+<!-- ── SANCTUAIRE ─────────────────────────────────────────────────────── -->
+<div id="sec-lock" class="sec">
+  <div class="card" style="border-color:rgba(192,57,43,.2)">
+    <div class="card-t"><span class="dot" style="background:var(--r)"></span><span style="color:var(--r)">Stock Source · Sanctuaire Absolu</span></div>
+    <div class="lock-box">
+      <div style="font-size:8px;color:rgba(192,57,43,.5);letter-spacing:.2em">VALEUR SANCTUARISÉE · 17% IMMUABLE</div>
+      <div class="lock-val">1 190 000 000</div>
+      <div class="lock-sub">ARTA</div>
+      <div class="lock-info">
+        ÉTAT ············· INTOUCHABLE<br/>
+        CHIFFREMENT ····· AES-256-GCM + ML-KEM-768<br/>
+        ISOLATION ········ 100% LOCALE · TITAN M2<br/>
+        EMBARGO ·········· 04 JUILLET 2027<br/>
+        RÈGLE SQL ········ CHECK (source ≥ supply × 0.17)<br/>
+        ANTI-WHALE ······· MAX 7% SUPPLY PAR JOUEUR
+      </div>
+      <button onclick="document.getElementById('denied').style.display='block'"
+        style="margin-top:12px;background:transparent;border:none;cursor:pointer;font-family:inherit;font-size:8px;color:rgba(192,57,43,.3);text-decoration:underline;letter-spacing:.1em">
+        Tentative d'accès...
+      </button>
+      <div id="denied" style="display:none;margin-top:10px;font-size:8px;color:var(--r);background:rgba(0,0,0,.6);border-radius:8px;padding:10px;animation:pulse 1s infinite;letter-spacing:.1em">
+        ⛔ ACCÈS REFUSÉ · ISOLATION QUANTIQUE ACTIVE<br/>SIGNATURE #347#lius#95 REQUISE
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-t"><span class="dot" style="background:var(--g)"></span><span style="color:var(--g)">Pools Système</span></div>
+    <div class="g2">
+      <div class="res-box"><div class="res-l">Stock Perso · 13%</div><div class="res-v" style="font-size:15px;color:var(--g)">910 000 000</div></div>
+      <div class="res-box"><div class="res-l">Variation [~] · 5%</div><div class="res-v" style="font-size:15px;color:var(--v)">350 000 000</div></div>
+      <div class="res-box"><div class="res-l">Frappe Adaptative · 10%</div><div class="res-v" style="font-size:15px;color:var(--o)">700 000 000</div></div>
+      <div class="res-box"><div class="res-l">Sécurité PQC · 8%</div><div class="res-v" style="font-size:15px;color:var(--c)">560 000 000</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── WALLETS ─────────────────────────────────────────────────────────── -->
+<div id="sec-wall" class="sec">
+  <div class="card">
+    <div class="card-t"><span class="dot" style="background:var(--o)"></span><span style="color:var(--o)">Multi-Chain · Wallets Souverains</span></div>
+    <div id="wallList"></div>
+    <div class="lock-info" style="border:none;background:rgba(0,0,0,.4);border-radius:8px;padding:12px;font-size:8px;color:rgba(200,200,216,.3);line-height:2.2">
+      HD WALLETS BIP39 · ROTATION D'ADRESSES ACTIVE<br/>
+      AES-256-GCM · TITAN M2 PIXEL 9 PRO<br/>
+      PQC KYBER-768 PRÉVU 2026-2027<br/>
+      ⚠️ VÉRIFICATION MiCA/AMF AVANT CONVERSION FIAT
+    </div>
+  </div>
+  <div class="card" style="border-color:rgba(212,175,55,.12)">
+    <div class="card-t"><span class="dot" style="background:var(--g)"></span><span style="color:var(--g)">Soutenir le Sanctuaire</span></div>
+    <a href="https://www.paypal.me/artakiel31" target="_blank" class="w-row" style="text-decoration:none;color:var(--g)">
+      <span style="font-size:13px">💛</span><span style="margin-left:10px;font-size:9px">PayPal · paypal.me/artakiel31</span>
+    </a>
+    <div class="w-row">
+      <div><span class="w-chain" style="color:var(--o);font-size:11px">BTC</span></div>
+      <div style="font-size:8px;color:#444;word-break:break-all;flex:1;margin-left:10px">bc1qkwcfwqcgntc2fe7l6ee9sv6p4ajqdxrerhrpel</div>
+    </div>
+    <div class="w-row">
+      <div><span class="w-chain" style="color:var(--s);font-size:11px">LTC</span></div>
+      <div style="font-size:8px;color:#444;flex:1;margin-left:10px">LiNsmKEanP5QVqJXdEV27byuvt84K9P1vA</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <span>ARTAKIEL{L.C©}#347 · FORCE · COURAGE · ENDURANCE</span>
+    <span>EMBARGO 04.07.2027 · [~] VARIATION INCONNUE</span>
+    <a href="https://artakiel.github.io/tempo-escargot.html" style="color:inherit;text-decoration:none">← TEMPO ESCARGOT 🐌</a>
+  </div>
+</footer>
+
+</div><!-- /app -->
+
 <script>
-// ─── CONSTANTES ───────────────────────────────────────────────
-const SANCTUARISATION_RATE = 0.20;
-const MAX_TOKENS = 1000;
+// ── GATE ─────────────────────────────────────────────────────────────────
+// Clé : artakiel347 (change ici si tu veux une autre clé)
+const KEY_HASH = '9f1e347artakiel';
+function simpleHash(s){let h=5381;for(let i=0;i<s.length;i++)h=(h*33^s.charCodeAt(i))>>>0;return h.toString(16)}
 
-let cycleCount = 0;
-let history = [];
-
-// ─── SHA-256 LOCAL ────────────────────────────────────────────
-async function sha256(text) {
-  const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+function gateCheck(){
+  const v = document.getElementById('gateInput').value.trim().toLowerCase();
+  // Clé acceptée : artakiel347
+  if(v === 'artakiel347'){
+    sessionStorage.setItem('ark_auth','1');
+    document.getElementById('gate').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+  } else {
+    const err = document.getElementById('gateErr');
+    err.style.display='block';
+    document.getElementById('gateInput').style.borderColor='rgba(192,57,43,.5)';
+    setTimeout(()=>{err.style.display='none';document.getElementById('gateInput').style.borderColor=''},2500);
+  }
+}
+function logout(){
+  sessionStorage.removeItem('ark_auth');
+  document.getElementById('app').style.display='none';
+  document.getElementById('gate').style.display='flex';
+  document.getElementById('gateInput').value='';
+}
+// Auto-login si déjà authentifié dans la session
+if(sessionStorage.getItem('ark_auth')==='1'){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('app').style.display='block';
 }
 
-// ─── ALGORITHME ÉMOTIONNEL ───────────────────────────────────
-function compilerEmotion(gravite, temporalite, infini, information) {
-  const g = Math.min(1, Math.max(0, gravite));
-  const t = Math.min(2, Math.max(0.1, temporalite));
-  const i = Math.min(1, Math.max(0, infini));
-  const info = Math.min(1, Math.max(0, information));
-  return Math.round(g * t * i * info * 100);
+// ── PARTICLES ────────────────────────────────────────────────────────────
+(function(){
+  const c=document.getElementById('canvas');
+  const ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<60;i++)pts.push({x:Math.random()*9999,y:Math.random()*9999,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.5,a:Math.random()});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.a+=.005;
+      if(p.x<0||p.x>W)p.vx*=-1;
+      if(p.y<0||p.y>H)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x%W,p.y%H,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,212,255,${.2+Math.sin(p.a)*.15})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── CONSTANTS ────────────────────────────────────────────────────────────
+const SUPPLY = 7_000_000_000;
+const TOKS = [
+  {label:'Source Intouchable (Créateur)', pct:17, color:'#c0392b'},
+  {label:'Mining Poétique (Communauté)',  pct:30, color:'#3dffc0'},
+  {label:'Flux IA · Transit · Axiome',    pct:15, color:'#B026FF'},
+  {label:'Bourse (9%) + GAFAM (6%)',      pct:15, color:'#FF6B35'},
+  {label:'Sécurité Absolue PQC',          pct:8,  color:'#00D4FF'},
+  {label:'Frappe Adaptative · Instinct',  pct:10, color:'#d4af37'},
+  {label:'Infinité [~]',                  pct:5,  color:'#FF00FF'},
+];
+const FAMILIA=[
+  {name:'Eau',        icon:'🌊',color:'#00D4FF',count:'1.4M',essence:'Profondeurs Émotionnelles'},
+  {name:'Feu',        icon:'🔥',color:'#FF4D00',count:'1.4M',essence:'Combustion Créatrice'},
+  {name:'Terre',      icon:'🌿',color:'#8BFF00',count:'1.4M',essence:'Structure Immuable'},
+  {name:'Air',        icon:'💨',color:'#E0E0E0',count:'1.4M',essence:'Volatilité Inspirée'},
+  {name:'Singularité',icon:'[~]',color:'#FF00FF',count:'1.4M',essence:"L'Infini et l'Inconnu"},
+  {name:'Éther',      icon:'✦', color:'#B026FF',count:'1.0M',essence:'Magie et Âme'},
+  {name:'Sciences',   icon:'⚙', color:'#00FFCC',count:'1.0M',essence:'Logique et Donnée'},
+];
+const WALLETS=[
+  {chain:'BTC', label:'Réserve Froide',          color:'#FF6B35',status:'DORMANT'},
+  {chain:'ETH', label:'DeFi / Smart Contracts',  color:'#B026FF',status:'ACTIF'},
+  {chain:'TRX', label:'Transit USDT Low-Cost',   color:'#3dffc0',status:'ACTIF'},
+  {chain:'ARTA',label:'Token Interne Sanctuarium',color:'#d4af37',status:'MINING'},
+];
+
+// ── EMOTIONAL ALGO ───────────────────────────────────────────────────────
+// Mots émotionnels avec variantes orthographiques tolérées
+const EMO_WORDS = [
+  ['amour','amours','amur','amurs','amo'],
+  ['peur','peurs','peu','peure'],
+  ['larme','larmes','larm','larme'],
+  ['âme','ame','ames','âmes'],
+  ['cœur','coeur','keur','ceur'],
+  ['nuit','nuits','nuit'],
+  ['lumière','lumiere','lumièr','lumieres'],
+  ['souffrance','soufrance','souffrance','souffranse'],
+  ['espoir','espoire','espoirs'],
+  ['vie','vies'],
+  ['mort','morte','morts'],
+  ['rêve','reve','rêves','reves'],
+  ['feu','feux'],
+  ['ombre','ombres','hombre'],
+  ['foi','foie'],
+  ['sincérité','sincerite','sincerité'],
+  ['force','forsse','forces'],
+  ['courage','courag','courages'],
+  ['endurance','endurence','enduranse'],
+  ['vérité','verite','vérités'],
+  ['silence','silance','silences'],
+  ['douleur','douleurs','douleurs'],
+  ['joie','joyes','joyes'],
+  ['pluie','pluies'],
+  ['soleil','soleils','solei'],
+  ['étoile','etoile','étoiles','etoiles'],
+  ['liberté','liberte','libertée'],
+  ['infini','infinity','infinit'],
+  ['chaos','kaos'],
+  ['espérance','esperance','esperanse'],
+];
+  function fuzzyMatch(word, variants){
+  const w=word.toLowerCase().replace(/[^a-zàâéèêëîïôùûüç]/g,'');
+  return variants.some(v=>{
+    if(w===v)return true;
+    if(w.length<3)return false;
+    let diff=0;const len=Math.max(w.length,v.length);
+    for(let i=0;i<len;i++){if(w[i]!==v[i])diff++}
+    return diff<=2;
+  });
 }
 
-// ─── MINING POÉTIQUE ─────────────────────────────────────────
-function calculerArta(sincerite) {
-  const s = Math.min(100, Math.max(0, sincerite));
-  const tokensBruts = Math.floor((s / 100) * MAX_TOKENS);
-  const vaultSanctuarise = Math.floor(tokensBruts * SANCTUARISATION_RATE);
-  const artaDisponible = tokensBruts - vaultSanctuarise;
-  return { tokensBruts, vaultSanctuarise, artaDisponible };
+function detectEmojis(text){
+  let score=0;
+  const counts={};
+  for(const [em,val] of Object.entries(EMO_EMOJIS)){
+    const n=(text.match(new RegExp(em,'g'))||[]).length;
+    if(n>0){counts[em]=n;score+=val*Math.min(n,3);}
+  }
+  return {score:Math.min(score,100),counts};
 }
 
-// ─── CYCLE OUROBOROS ─────────────────────────────────────────
-async function executerCycle() {
-  const btn = document.getElementById('mine-btn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Cycle en cours...';
-  document.getElementById('status').textContent = 'Cycle en cours...';
+function analyzePoem(text){
+  const words=text.trim().split(/\s+/).filter(Boolean);
+  const lines=text.split('\n').filter(l=>l.trim()).length;
+  const hour=new Date().getHours();
 
-  const sincerite = parseInt(document.getElementById('sincerity-slider').value);
-  const hour = new Date().getHours();
-  const temporalite = hour < 5 ? 1.3 : hour < 9 ? 1.2 : hour < 18 ? 1.0 : 1.15;
+  // Longueur
+  const lenScore=Math.min(100,words.length<10?words.length*4:words.length<50?40+words.length*.6:words.length<150?70+words.length*.2:100);
 
-  const emotion = compilerEmotion(0.5, temporalite, 0.77, 0.8);
-  const arta = calculerArta(sincerite);
+  // Mots émotionnels (avec fautes tolérées)
+  let emoCount=0;
+  words.forEach(w=>{EMO_WORDS.forEach(variants=>{if(fuzzyMatch(w,variants))emoCount++;})});
+  const emoScore=Math.min(100,emoCount*12);
 
-  const payload = JSON.stringify({ cycle: cycleCount + 1, timestamp: Date.now(), emotion, arta });
-  const hash = await sha256(payload);
+  // Emojis
+  const {score:emojiScore}=detectEmojis(text);
 
-  const record = { cycle: cycleCount + 1, timestamp: Date.now(), emotion, arta, hash: hash.slice(0, 32) };
-  history.unshift(record);
-  if (history.length > 50) history = history.slice(0, 50);
-  cycleCount++;
+  // Vulnérabilité (pronoms + aveux)
+  const pronouns=(text.match(/\b(je|moi|mon|ma|mes|j'|m')\b/gi)||[]).length;
+  const confessions=(text.match(/\b(je souffre|j'ai peur|je pleure|j'aime|je vis|je meurs|je rêve|j'espère)\b/gi)||[]).length;
+  const vulnScore=Math.min(100,pronouns*10+confessions*20);
 
-  // Afficher le résultat
-  document.getElementById('cycle-num').textContent = cycleCount;
-  document.getElementById('res-emotion').textContent = emotion + '%';
-  document.getElementById('res-bruts').textContent = arta.tokensBruts;
-  document.getElementById('res-vault').textContent = '-' + arta.vaultSanctuarise;
-  document.getElementById('res-arta').textContent = arta.artaDisponible;
-  document.getElementById('res-hash').textContent = 'SHA-256: ' + hash.slice(0, 32) + '...';
-  document.getElementById('result-card').style.display = 'block';
+  // Structure (strophes, ponctuation)
+  const struScore=Math.min(100,lines*7+(text.includes(',')?.12:0)+(text.includes('.')?.12:0)+(text.includes('!')?.10:0)+(text.includes('?')?.8:0));
 
-  // Mettre à jour l'historique
-  const historyDiv = document.getElementById('history');
-  historyDiv.innerHTML = history.slice(0, 10).map(r =>
-    `<div class="history-item">
-      <span>Cycle #${r.cycle}</span>
-      <span>${r.emotion}% émot.</span>
-      <span>+${r.arta.artaDisponible} ARTA</span>
-      <span style="font-size:0.45rem;">${r.hash.slice(0,8)}</span>
-    </div>`
-  ).join('');
+  // Facteur temporel (Loïc code la nuit)
+  const tf=hour>=0&&hour<5?1.35:hour<9?1.2:hour<18?1.0:1.15;
 
-  document.getElementById('status').textContent = 'Isolation Locale Maintenue';
-  btn.disabled = false;
-  btn.textContent = '⚡ Initialiser la Sincérité';
+  // Score composite
+  const base=(lenScore*.20+emoScore*.25+vulnScore*.30+struScore*.15+emojiScore*.10)*tf;
+  const vari=Math.random()*.07;
+  const sinc=Math.min(100,base*(1+vari));
+  const tokens=Math.floor((sinc/100)*1000);
+
+  const weather=['storm','calm','sunny','night','aurora'][hour%5];
+
+  return {
+    sinc:Math.round(sinc),tokens,
+    scores:{lenScore,emoScore:Math.min(100,emoScore+emojiScore*.3),vulnScore,struScore},
+    weather,proof:mockHash(text+Date.now()),
+    block:Math.floor(Date.now()/1000),
+    dist:{
+      joueur:Math.floor(tokens*.30),
+      source:Math.floor(tokens*.17),
+      architecte:Math.floor(tokens*.10),
+      variation:Math.floor(tokens*.05),
+      partenaires:Math.floor(tokens*.15),
+    }
+  };
 }
 
-// ─── SLIDER ──────────────────────────────────────────────────
-document.getElementById('sincerity-slider').addEventListener('input', function() {
-  document.getElementById('sincerity-val').textContent = this.value + '%';
+// ── HASH MOCK ─────────────────────────────────────────────────────────────
+function mockHash(s){
+  let h=0n;
+  for(let i=0;i<s.length;i++)h=(h*31n+BigInt(s.charCodeAt(i)))&0xFFFFFFFFFFFFFFFFn;
+  return h.toString(16).padStart(16,'0').repeat(4).slice(0,64);
+}
+
+// ── MINING ───────────────────────────────────────────────────────────────
+const WEATHERS={
+  storm:{label:'TEMPÊTE CRÉATRICE',color:'#FF6B35',icon:'⚡'},
+  calm: {label:'CALME FRACTAL',    color:'#00D4FF',icon:'🌊'},
+  sunny:{label:'SOLEIL POÉTIQUE',  color:'#d4af37',icon:'☀'},
+  night:{label:'NUIT ALCHIMIQUE',  color:'#B026FF',icon:'🌑'},
+  aurora:{label:'AURORE QUANTIQUE',color:'#3dffc0',icon:'✦'},
+};
+const SCORE_LABELS=[
+  {key:'lenScore',  label:'Longueur du texte',  color:'#00D4FF'},
+  {key:'emoScore',  label:'Mots + emojis émotionnels', color:'#B026FF'},
+  {key:'vulnScore', label:'Vulnérabilité (je/moi)', color:'#3dffc0'},
+  {key:'struScore', label:'Structure poétique',  color:'#d4af37'},
+];
+const DIST_CFG={
+  joueur:     {label:'Communauté (30%)',  color:'#3dffc0'},
+  source:     {label:'Source (17%)',      color:'#c0392b'},
+  architecte: {label:'Architecte (10%)', color:'#d4af37'},
+  variation:  {label:'[~] (5%)',          color:'#B026FF'},
+  partenaires:{label:'Partenaires (15%)',color:'#FF6B35'},
+};
+
+let mineHistory=[];
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('poemInput')?.addEventListener('input',function(){
+    const w=this.value.trim().split(/\s+/).filter(Boolean).length;
+    document.getElementById('poemCount').textContent=`${w} mot${w>1?'s':''} · ${this.value.length} car.`;
+  });
 });
+
+function doMine(){
+  const txt=document.getElementById('poemInput').value;
+  if(txt.trim().length<8)return;
+  const btn=document.getElementById('mineBtn');
+  btn.disabled=true;btn.textContent='TRANSMUTATION EN COURS...';
+
+  setTimeout(()=>{
+    const r=analyzePoem(txt);
+    const w=WEATHERS[r.weather];
+
+    // Scores visuels
+    document.getElementById('scoreSection').style.display='block';
+    document.getElementById('scoreLines').innerHTML=SCORE_LABELS.map(s=>`
+      <div class="score-item">
+        <div class="score-meta">
+          <span style="color:${s.color}">${s.label}</span>
+          <span style="color:rgba(200,200,216,.4)">${Math.round(r.scores[s.key])}%</span>
+        </div>
+        <div class="score-bar"><div class="score-fill" style="width:0%;background:${s.color}" data-w="${r.scores[s.key]}"></div></div>
+      </div>`).join('');
+    setTimeout(()=>{document.querySelectorAll('.score-fill').forEach(e=>e.style.width=e.dataset.w+'%')},50);
+
+    // Résultat
+             document.getElementById('resSinc').textContent=r.sinc+'%';
+    document.getElementById('resTok').textContent='+'+r.tokens.toLocaleString();
+    document.getElementById('resBlock').textContent=r.block;
+    document.getElementById('resProof').textContent=r.proof;
+    document.getElementById('weatherTag').innerHTML=`<span class="weather" style="color:${w.color};border-color:${w.color}40;background:${w.color}10">${w.icon} ${w.label}</span>`;
+    document.getElementById('resDist').innerHTML=Object.keys(r.dist).map(k=>`
+      <div class="dist-row">
+        <span style="color:${DIST_CFG[k].color}">${DIST_CFG[k].label}</span>
+        <span style="color:rgba(200,200,216,.4)">+${r.dist[k].toLocaleString()} ARTA</span>
+      </div>`).join('');
+    document.getElementById('mineResult').style.display='block';
+
+    // Historique
+    mineHistory.unshift({tokens:r.tokens,sinc:r.sinc,poem:txt.slice(0,50),date:new Date().toLocaleString('fr-FR'),weather:r.weather});
+    if(mineHistory.length>10)mineHistory.pop();
+    updateStats();renderHistory();drawHistChart();
+
+    btn.disabled=false;btn.textContent='⚡ MINER · SHA-256';
+  },900);
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────
+function updateStats(){
+  const total=mineHistory.reduce((a,h)=>a+h.tokens,0);
+  document.getElementById('hubSessions').textContent=mineHistory.length;
+  document.getElementById('hubTotal').textContent=total>999?Math.floor(total/1000)+'k':total;
+}
+
+// ── HISTORY ──────────────────────────────────────────────────────────────
+function renderHistory(){
+  const el=document.getElementById('histList');
+  if(!mineHistory.length){el.innerHTML='<p style="font-size:9px;color:rgba(200,200,216,.2);text-align:center;padding:20px">Aucune session.</p>';return;}
+  el.innerHTML=mineHistory.map(h=>{
+    const w=WEATHERS[h.weather];
+    return`<div class="hist-item">
+      <div class="hist-tokens">+${h.tokens}</div>
+      <div style="flex:1;min-width:0">
+        <div class="hist-poem">${h.poem}...</div>
+        <div style="margin-top:3px"><span class="weather" style="color:${w.color};border-color:${w.color}40;background:${w.color}10;font-size:7px">${w.icon} ${h.sinc}%</span></div>
+      </div>
+      <div class="hist-date">${h.date}</div>
+    </div>`;}).join('');
+}
+
+// ── DONUT CHART ───────────────────────────────────────────────────────────
+function drawDonut(){
+  const c=document.getElementById('donutChart');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth*2;c.height=c.offsetHeight*2;
+  const W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2,cy=H/2,R=Math.min(W,H)*.38,ri=R*.6;
+  let angle=-Math.PI/2;
+  TOKS.forEach(t=>{
+    const a=(t.pct/100)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,R,angle,angle+a);ctx.closePath();
+    ctx.fillStyle=t.color+'cc';ctx.fill();
+    // Label
+    const mid=angle+a/2;
+    const lx=cx+Math.cos(mid)*(R*.75),ly=cy+Math.sin(mid)*(R*.75);
+    ctx.fillStyle='rgba(0,0,0,.7)';ctx.beginPath();ctx.arc(lx,ly,18,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font=`bold ${W*.022}px Share Tech Mono`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(t.pct+'%',lx,ly);
+    angle+=a;
+  });
+  // Centre
+  ctx.beginPath();ctx.arc(cx,cy,ri,0,Math.PI*2);ctx.fillStyle='#030305';ctx.fill();
+  ctx.fillStyle='#d4af37';ctx.font=`900 ${W*.045}px Cinzel`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('7B',cx,cy-W*.025);
+  ctx.fillStyle='rgba(200,200,216,.4)';ctx.font=`${W*.02}px Share Tech Mono`;
+  ctx.fillText('ARTA',cx,cy+W*.025);
+}
+
+// ── HISTORY CHART ─────────────────────────────────────────────────────────
+function drawHistChart(){
+  const c=document.getElementById('histChart');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth*2;c.height=c.offsetHeight*2;
+  const W=c.width,H=c.height,pad=40;
+  ctx.clearRect(0,0,W,H);
+  if(!mineHistory.length)return;
+  const data=mineHistory.slice().reverse();
+  const max=Math.max(...data.map(d=>d.tokens),100);
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=pad+(H-pad*2)*(1-i/4);ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();}
+  // Line
+  const xs=data.map((_,i)=>pad+i*(W-pad*2)/(Math.max(data.length-1,1)));
+  const ys=data.map(d=>pad+(H-pad*2)*(1-d.tokens/max));
+  // Area
+  const grad=ctx.createLinearGradient(0,pad,0,H-pad);
+  grad.addColorStop(0,'rgba(176,38,255,.25)');grad.addColorStop(1,'rgba(176,38,255,.02)');
+  ctx.beginPath();ctx.moveTo(xs[0],ys[0]);
+  xs.forEach((x,i)=>i>0&&ctx.lineTo(x,ys[i]));
+  ctx.lineTo(xs[xs.length-1],H-pad);ctx.lineTo(xs[0],H-pad);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+  // Line
+  ctx.beginPath();ctx.moveTo(xs[0],ys[0]);
+  xs.forEach((x,i)=>i>0&&ctx.lineTo(x,ys[i]));
+  ctx.strokeStyle='#B026FF';ctx.lineWidth=2;ctx.stroke();
+  // Dots
+  xs.forEach((x,i)=>{
+    ctx.beginPath();ctx.arc(x,ys[i],5,0,Math.PI*2);
+    ctx.fillStyle='#B026FF';ctx.fill();
+    ctx.fillStyle='rgba(200,200,216,.6)';ctx.font=`${W*.018}px Share Tech Mono`;
+    ctx.textAlign='center';ctx.fillText('+'+data[i].tokens,x,ys[i]-12);
+  });
+  // X labels
+  data.forEach((d,i)=>{
+    ctx.fillStyle='rgba(200,200,216,.2)';ctx.font=`${W*.015}px Share Tech Mono`;
+    ctx.textAlign='center';ctx.fillText('Session '+(i+1),xs[i],H-pad+16);
+  });
+}
+
+// ── RENDER HELPERS ────────────────────────────────────────────────────────
+function renderTokenBars(){
+  const el=document.getElementById('tokenBars');
+  if(!el)return;
+  el.innerHTML=TOKS.map(t=>`
+    <div class="trow">
+      <div class="trow-meta">
+        <span style="color:${t.color}">${t.label}</span>
+        <span style="color:rgba(200,200,216,.3)">${t.pct}% · ${Math.floor(SUPPLY*t.pct/100).toLocaleString()}</span>
+      </div>
+      <div class="tbar"><div class="tbar-f" style="width:0%;background:${t.color}" data-w="${t.pct}"></div></div>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('.tbar-f').forEach(e=>e.style.width=e.dataset.w+'%'),100);
+}
+function renderFamilia(){
+  const el=document.getElementById('famGrid');
+  if(!el)return;
+  el.innerHTML=FAMILIA.map(f=>`
+    <div class="fam-card">
+      <div class="fam-icon">${f.icon}</div>
+      <div>
+        <div class="fam-name" style="color:${f.color}">Familia ${f.name}</div>
+        <div class="fam-sub">${f.count} PNJ · ${f.essence}</div>
+      </div>
+    </div>`).join('');
+}
+function renderWallets(){
+  const el=document.getElementById('wallList');
+  if(!el)return;
+  el.innerHTML=WALLETS.map(w=>`
+    <div class="w-row">
+      <div><span class="w-chain" style="color:${w.color}">${w.chain}</span><span class="w-label">${w.label}</span></div>
+      <span class="w-status" style="color:${w.color};border-color:${w.color}40;background:${w.color}10">${w.status}</span>
+    </div>`).join('');
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+const TABS=['hub','mine','hist','gb','univ','lock','wall'];
+function goTab(id){
+  TABS.forEach(t=>{
+    document.getElementById('sec-'+t)?.classList.remove('on');
+    document.querySelectorAll('.tab')[TABS.indexOf(t)]?.classList.remove('on');
+  });
+  document.getElementById('sec-'+id)?.classList.add('on');
+  document.querySelectorAll('.tab')[TABS.indexOf(id)]?.classList.add('on');
+  if(id==='hub'){setTimeout(drawDonut,50)}
+  if(id==='hist'){setTimeout(drawHistChart,50)}
+}
+
+// ── LIVE ──────────────────────────────────────────────────────────────────
+let ping=347,sec=97;
+setInterval(()=>{
+  ping++;sec=Math.min(100,Math.max(92,sec+(Math.random()-.5)*1.5));
+  document.getElementById('hdrMeta').textContent=`JWT · PNJ 10 000 000 · #${ping} · ${new Date().toLocaleTimeString('fr-FR')}`;
+  document.getElementById('secBadge').textContent=`⬡ SÉC ${sec.toFixed(0)}%`;
+},3000);
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+function initApp(){
+  renderTokenBars();renderFamilia();renderWallets();
+  setTimeout(drawDonut,200);
+}
+if(sessionStorage.getItem('ark_auth')==='1')initApp();
 </script>
 </body>
 </html>
